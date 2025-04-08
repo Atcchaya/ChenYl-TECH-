@@ -20,3 +20,4 @@ typedef struct {
 
 
 void vide_buffer();
+INQF INQF
