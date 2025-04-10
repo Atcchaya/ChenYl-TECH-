@@ -262,3 +262,4 @@ int main() {
     fclose(fichierMenu); // Ferme le fichier
     return 0;
 }// chat gpt
+// CHAT GPT
