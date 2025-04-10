@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-// Prototypes des fonctions (on les écrira plus tard)
+
 void ajouterAnimal();
 void rechercherAnimal();
 void adopterAnimal();
