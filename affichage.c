@@ -108,7 +108,7 @@ void afficherMenu(FILE *fichier) {
 
 int main() {
     int choix;
-    FILE *fichierMenu = fopen("menu.txt", "w");
+    FILE *fichierMenu = fopen("Menu.txt", "w");
     FILE *fichierAnimaux = fopen("animaux.txt", "a");
 
     if (fichierMenu == NULL || fichierAnimaux == NULL) {
