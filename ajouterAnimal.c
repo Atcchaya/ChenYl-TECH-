@@ -1,80 +1,97 @@
-#include "animal.h"    // Définitions liées à la structure Animal et ses fonctions associées
-#include "id.h"        // Pour générer des IDs uniques
-#include <stdio.h>     // Pour les fonctions d'entrée/sortie (printf, scanf, etc.)
-#include <stdlib.h>    // Pour system(), malloc, free...
-#include "utils.h"     // Pour des fonctions utilitaires comme nettoyerBuffer()
+#include <stdio.h>
 
-// Définitions de couleurs ANSI pour styliser les messages dans le terminal
-#define BLUE    "\033[94m"
-#define ORANGE  "\033[38;5;214m"
-#define GREEN   "\033[92m"
-#define YELLOW  "\033[93m"
-#define RESET   "\033[0m"
-#define RED     "\033[91m"
+typedef struct {
+    int id;
+    int espece;
+    char nom[20];
+    int age;
+    float poids;
+} Animal;
 
-// Fonction pour ajouter un nouvel animal au fichier
-void ajouterAnimal() {
-    system("mkdir -p animaux");  // Crée le dossier "animaux" s’il n’existe pas déjà
+// Vérifie si un ID existe déjà dans le fichier
+int idExisteDeja(int idRecherche) {
+    FILE *fichier = fopen("animaux.txt", "r");
+    if (fichier == NULL) 
+     return 0; // Le fichier n'existe pas encore
 
-    FILE *f = fopen("animaux/animaux.txt", "a");  // Ouvre le fichier en mode ajout
-    if (!f) {
-        printf(RED "❌ Erreur : Le fichier n'a pas pu être ouvert pour l'ajout.\n" RESET);
-        return;  // En cas d'erreur, on arrête ici
+    int id;
+    while (fscanf(fichier, "%d", &id) == 1) {
+        if (id == idRecherche) {
+            fclose(fichier);
+            return 1;
+        }
+        fscanf(fichier, "%*d %*s %*d %*f"); // ignorer le reste de la ligne
     }
 
-    Animal a;                     // Déclaration d’une structure Animal
-    a.id = genererID();           // Attribution d’un ID unique à l’animal
+    fclose(fichier);
+    return 0;
+}
 
-    printf(ORANGE "🌟 --- Enregistrement d’un nouvel animal --- 🐾\n" RESET);
+void ajouterAnimal() {
+    Animal nouvelAnimal;
+
+    // Saisie et vérification de l'ID
+    do {
+        printf("Entrez l'ID de l'animal (entre 1 et 9999) : ");
+        scanf("%d", &nouvelAnimal.id);
+
+        if (nouvelAnimal.id < 1 || nouvelAnimal.id > 9999) {
+            printf("❌ ID invalide. Veuillez entrer une valeur entre 1 et 9999.\n");
+        } else if (idExisteDeja(nouvelAnimal.id)) {
+            printf("❌ Cet ID existe déjà. Veuillez en choisir un autre.\n");
+            nouvelAnimal.id = -1; // forcer à recommencer
+        }
+    } while (nouvelAnimal.id < 1 || nouvelAnimal.id > 9999);
+
+    // Saisie et vérification de l'espèce
+    do {
+        printf("Entrez l'espèce :\n");
+        printf(" 1 = Chien\n 2 = Chat\n 3 = Lapin\n 4 = Hamster\nVotre choix : ");
+        scanf("%d", &nouvelAnimal.espece);
+
+        if (nouvelAnimal.espece < 1 || nouvelAnimal.espece > 4) {
+            printf("❌ Espèce invalide. Veuillez choisir un nombre entre 1 et 4.\n");
+        }
+    } while (nouvelAnimal.espece < 1 || nouvelAnimal.espece > 4);
 
     // Saisie du nom
-    printf(BLUE "🦴 Nom de l'animal : " RESET);
-    scanf("%49s", a.nom);         // Lecture du nom (maximum 49 caractères)
-    nettoyerBuffer();            // Vide le buffer pour éviter les erreurs de lecture ensuite
+    printf("Entrez le nom de l'animal (max 19 caractères, sans espaces) : ");
+    scanf("%19s", nouvelAnimal.nom); // pas besoin de string.h
 
-    a.espece = choisirEspece();  // Appelle une fonction qui permet à l'utilisateur de choisir une espèce
-
-    // Boucle de validation pour l’année de naissance
+    // Saisie et vérification de l'âge
     do {
-        printf(BLUE "📅 Entrez l'année de naissance de l'animal : " RESET);
-        scanf("%d", &a.annee_naissance);
-        nettoyerBuffer();
+        printf("Entrez l'âge (en années, entre 0 et 50) : ");
+        scanf("%d", &nouvelAnimal.age);
 
-        // Vérifie la validité de l’année
-        if (a.annee_naissance < 0) {
-            printf(RED "⚠️  L'année ne peut pas être négative, réessayez !\n" RESET);
-        } 
-        else if (a.annee_naissance < 1900 || a.annee_naissance > 2025) {
-            printf(RED "⚠️  L'année doit être entre 1900 et 2025. Essayez à nouveau.\n" RESET);
+        if (nouvelAnimal.age < 0 || nouvelAnimal.age > 50) {
+            printf("❌ Âge invalide. Veuillez entrer une valeur entre 0 et 50.\n");
         }
-    } while (a.annee_naissance < 1900 || a.annee_naissance > 2025 || a.annee_naissance < 0);
+    } while (nouvelAnimal.age < 0 || nouvelAnimal.age > 50);
 
-    // Boucle de validation pour le poids
+    // Saisie et vérification du poids
     do {
-        printf(BLUE "⚖️ Poids (en kg) : " RESET);
-        scanf("%f", &a.poids);
-        nettoyerBuffer();
+        printf("Entrez le poids (en kg, entre 0.1 et 100.0) : ");
+        scanf("%f", &nouvelAnimal.poids);
 
-        if (a.poids <= 0) {
-            printf(RED "⚠️  Le poids doit être strictement supérieur à zéro. Veuillez réessayer.\n" RESET);
+        if (nouvelAnimal.poids < 0.1f || nouvelAnimal.poids > 100.0f) {
+            printf("❌ Poids invalide. Veuillez entrer une valeur entre 0.1 et 100.0 kg.\n");
         }
-    } while (a.poids <= 0);
+    } while (nouvelAnimal.poids < 0.1f || nouvelAnimal.poids > 100.0f);
 
-    // Commentaire libre sur l’animal
-    printf(BLUE "📋 Commentaire supplémentaire : " RESET);
-    fgets(a.commentaire, TAILLE_COMM, stdin); // Lecture d’une ligne entière
+    // Ajout dans le fichier
+    FILE *fichier = fopen("animaux.txt", "a");
+    if (fichier == NULL) {
+        printf("❌ Erreur : impossible d'ouvrir le fichier.\n");
+        return;
+    }
 
-    // Écriture des données dans le fichier (format CSV avec point-virgule)
-    fprintf(f, "%d;%s;%s;%d;%.2f;%s\n",
-            a.id, 
-            a.nom, 
-            especeToStr(a.espece),  // Convertit l'espèce en chaîne de caractères
-            a.annee_naissance, 
-            a.poids, 
-            a.commentaire);
+    fprintf(fichier, "%d %d %s %d %.2f\n",
+            nouvelAnimal.id,
+            nouvelAnimal.espece,
+            nouvelAnimal.nom,
+            nouvelAnimal.age,
+            nouvelAnimal.poids);
 
-    fclose(f);  // Ferme le fichier après écriture
-
-    // Message de confirmation stylisé
-    printf(GREEN "🎉 L'animal #%d a été ajouté avec succès au refuge ! 🐾\n" RESET, a.id);
+    fclose(fichier);
+    printf("✅ Animal ajouté avec succès !\n");
 }
