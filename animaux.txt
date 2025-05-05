@@ -1,3 +1,45 @@
 8633;LISA;CHAT;2023;34.00;Joueur
 8703;1;CHIEN;2023;34.00;excité
 8965;MILA;HAMSTER;2024;23.00;mignon
+ID: 1
+Nom: zara
+Espèce: chien
+Année de naissance: 2005
+Poids: 12.00
+Commentaire: JOVIALE
+
+ID: 1
+Nom: YARA
+Espèce: CHIEN
+Année de naissance: 2005
+Poids: 23.00
+Commentaire: GENTIL
+
+ID: 1
+Nom: ZARA
+Espèce: CHIEN
+Année de naissance: 2005
+Poids: 23.00
+Commentaire: Gentil
+
+ID: 2
+Nom: RED
+Espèce: CHAT
+Année de naissance: 2021
+Poids: 3.00
+Commentaire: DOUX
+
+ID: 2
+Nom: YITI
+Espèce: OISEAU
+Année de naissance: 2009
+Poids: 4.00
+Commentaire: CHANTEUR
+
+ID: 1
+Nom: ZARA
+Espèce: CHIEN
+Année de naissance: 2009
+Poids: 22.00
+Commentaire: GENTIL
+

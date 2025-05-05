@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+
 #define MAX_ANIMAUX 50
 
 // Définition de la structure Animal
@@ -13,232 +15,271 @@ typedef struct {
     char commentaire[100];
 } Animal;
 
-int comparer(char *a,char *b){
-    int i=0;
-    while(a[i]!='\0'&&b[i]!='\0'){
-        if(a[i]!=b[i]){
+int comparer(char *a, char *b) {
+    int i = 0;
+    while (a[i] != '\0' && b[i] != '\0') {
+        if (a[i] != b[i]) {
             return 0;
         }
-    i++;
+        i++;
     }
-    if (a[i]=='\0' && b[i]=='\0'){
+    if (a[i] == '\0' && b[i] == '\0') {
         return 1;
     }
     return 0;
-}// pas compris
+}
 
+void ajouterAnimal() {
+    Animal nouvelAnimal;
+    FILE *fichier = fopen("animaux.txt", "a");
 
-void rechercherAnimal(FILE *fichier, FILE*fichier_individuel){
-    int choix2;
-    printf("vous souhaiter rechercher en fonction de quoi? 1: nom 2: age 3:espece");
-    scanf("%d", &choix2);
-
-    FILE *fichier = fopen("animaux.txt", "r");  // Ouvre le fichier en mode lecture (r)
     if (fichier == NULL) {
-        printf("Erreur d'ouverture du fichier.\n");
-        return 1;  // Quitte la fonction si le fichier ne peut pas être ouvert
-    }
-    
-    char ligne[200];  // Variable pour stocker chaque ligne lue du fichier
-    int animal_trouve = 0;  // Variable pour indiquer si l'animal a été trouvé
-    
-    if (choix2 == 1){// Recherche par nom
-        char nom[30];
-        printf("Veuillez entrer le nom de l'animal que vous souhaitez rechercher:\n");
-        scanf("%s", nom);//L'utilisateur entre le nom de l'animal qu'il souhaite rechercher
-          while(fgets(ligne,200, fichier)) {  // Lit chaque ligne du fichier
-            if (ligne[0]=='N' && ligne[1]=='o' && ligne[2]=='m' && ligne[3]==':' && ligne[4]==' ') {  // Vérifie si la ligne commence par "Nom:"
-                if (comparer(ligne+5, nom)) {  // Compare le nom de l'animal avec celui recherché
-                    printf("Animal trouvé : %s", ligne);  // Affiche la ligne contenant l'animal trouvé
-                    animal_trouve = 1;  // Met à jour la variable pour indiquer que l'animal a été trouvé
-                    break;  // Sort de la boucle si l'animal est trouvé
-                }
-                printf("Animal trouvé : %s", ligne);  // Affiche la ligne contenant l'animal trouvé
-                animal_trouve = 1;  // Met à jour la variable pour indiquer que l'animal a été trouvé
-                break;  // Sort de la boucle si l'animal est trouvé
-            }
-        }
-        if (animal_trouve == 0) {  // Si l'animal n'a pas été trouvé
-            printf("Animal non trouvé.\n");  // Affiche un message indiquant que l'animal n'a pas été trouvé
-        }
-        fclose(fichier);  // Ferme le fichier après la recherche
-
-
-
-    }
-    //ya une erreur ici parce que je dois calculer l'age de l'animal en fonction de l'année actuelle
-    if (choix2==2){//Recherche par age
-        int age;
-        printf("Veuillez entrer l'age de l'animal que vous souhaitez rechercher:\n");
-        scanf("%d", &age);
-
-        while(fgets(ligne,200,fichier)){
-            if(ligne[0]=='A'&&ligne[1]=='n'&&ligne[2]=='n'&&ligne[3]=='é'&&ligne[4]=='e'&&ligne[5]==' '){
-                if(comparer(ligne+6,age)){
-                    printf("animal trouvé : %s", ligne);  // Affiche la ligne contenant l'animal trouvé
-                    animal_trouve = 1;  // Met à jour la variable pour indiquer que l'animal a été trouvé
-                    break;  // Sort de la boucle si l'animal est trouvé
-                }
-                printf("animal trouvé : %s", ligne);  // Affiche la ligne contenant l'animal trouvé
-                animal_trouve = 1;  // Met à jour la variable pour indiquer que l'animal a été trouvé
-                break;  // Sort de la boucle si l'animal est trouvé
-            }
-    
-        }
-        if(animal_trouve == 0) {  // Si l'animal n'a pas été trouvé
-            printf("Animal non trouvé.\n");  // Affiche un message indiquant que l'animal n'a pas été trouvé
-        }
-        fclose(fichier);  // Ferme le fichier après la recherche
-}
-
-    }
-}
-    if (choix2==3){//Recherche par espece
-        char especes[30];
-        int nb_trouve=0;
-        printf("Veuillez entrer l'espece de l'animal que vous souhaitez rechercher:\n");
-        scanf("%s" ,especes);
-
-        while(fgets(ligne,200,fichier)){
-            if(ligne[0]=='E'&&ligne[1]=='s'&&ligne[2]=='p'&&ligne[3]=='è'&&ligne[4]=='c'&&ligne[5]=='e'&&ligne[6]==' '){
-                if(comparer(ligne+7,especes)){
-                    printf("animal trouvé : %s", ligne);  // Affiche la ligne contenant l'animal trouvé
-                    nb_trouve++;  // Incrémente le compteur d'animaux trouvés
-                    animal_trouve = 1;  // Met à jour la variable pour indiquer que l'animal a été trouvé
-                     // Sort de la boucle si l'animal est trouvé
-                }
-
-    
-        }
-        if(animal_trouve == 0) {
-            printf("Aucun animal de cette espece n'a été trouvé.\n");
-        } else {
-            printf("\nNombre d'animaux de cette espece : %d\n", nb_trouves);
-        }
-        
-        fclose(fichier);  // Ferme le fichier après la recherche
-
+        printf("Erreur d'ouverture du fichier animaux.txt pour l'ajout.\n");
+        return;
     }
 
+    printf("\n--- Ajouter un nouvel animal ---\n");
 
-    //Creation d'un fichier individuel pour chaque animal
-    char nom_fichier[50];
-    fprintf("nom_fichier","animal_%d.txt", animal.id);
-    FILE *fichier_individuel = fopen(nom_fichier, "w");  // Ouvre le fichier en mode écriture (w)
-    if (fichier_individuel == NULL) {
-        printf("Erreur d'ouverture du fichier individuel.\n");
-        return 1;  // Quitte la fonction si le fichier ne peut pas être ouvert    
-    }
-    fprintf(fichier_individuel, "ID: %d\n", animal.id);
-    fprintf(fichier_individuel, "Nom: %s\n", animal.nom);
-    fprintf(fichier_individuel, "Espèce: %s\n", animal.espece);
-    fprintf(fichier_individuel, "Année de naissance: %d\n", animal.annee_naissance);
-    fprintf(fichier_individuel, "Poids: %.2f kg\n", animal.poids);
-    fprintf(fichier_individuel, "Commentaire: %s\n", animal.commentaire);  // \n\n pour séparer les animaux
-    fclose(fichier_individuel);  // Fermeture du fichier individuel
-    
-    //Ajout de l'identifiant de l'animal dans le fichier principal
-    FILE *fichier_principal = fopen("animaux.txt", "a");  // Ouvre le fichier principal en mode ajout (a)
-    if (fichier_principal != NULL) {
-        fprintf(fichier_principal, "ID: %d\n", animal.id);
-        fclose(fichier_principal);  // Fermeture du fichier principal
-} // Affichage menu principal
-int main() {
-    Animal animal;
-
-    // Demande de saisie à l'utilisateur
     do {
-        printf("Entrez l'ID de l'animal : ");//faire boucle pour que l'utilisateur donne un identifiant compris entre 1 et 50 compris
-        scanf("%d", &animal.id);
-    } while (animal.id < 1 || animal.id > MAX_ANIMAUX);  // Vérifie que l'ID est valide
-    
+        printf("Entrez l'ID de l'animal (entre 1 et %d) : ", MAX_ANIMAUX);
+        scanf("%d", &nouvelAnimal.id);
+    } while (nouvelAnimal.id < 1 || nouvelAnimal.id > MAX_ANIMAUX);
+    getchar();
+
     printf("Entrez le nom de l'animal : ");
-    scanf("%s", animal.nom);
-    
+    scanf("%s", nouvelAnimal.nom);
+    getchar();
+
     printf("Entrez l'espèce de l'animal : ");
-    scanf("%s", animal.espece);
-    
+    scanf("%s", nouvelAnimal.espece);
+    getchar();
+
     do {
-        printf("Entrez l'année de naissance : ");//faire une boucle pour que l'utilisateur entre une annee de naissance positive et inferieur a 2026
-        scanf("%d", &animal.annee_naissance);
-    }while(animal.annee_naissance < 0 ); // Vérifie que l'année de naissance est valide
-    
-    do{
-        printf("Entrez le poids de l'animal (kg) : ");//faire une boucle pour que l'utilisateur entre un poid positif 
-        scanf("%f", &animal.poids);
-    }while(animal.poids < 0); // Vérifie que le poids est valide
-    
+        printf("Entrez l'année de naissance (positive) : ");
+        scanf("%d", &nouvelAnimal.annee_naissance);
+    } while (nouvelAnimal.annee_naissance < 0);
+    getchar();
+
+    do {
+        printf("Entrez le poids de l'animal (kg, positif) : ");
+        scanf("%f", &nouvelAnimal.poids);
+    } while (nouvelAnimal.poids < 0);
+    getchar();
+
     printf("Entrez un commentaire : ");
-    scanf(" %[^\n]", animal.commentaire);  // Permet de lire une phrase complète
+    scanf("%[^\n]", nouvelAnimal.commentaire);
 
-    // Affichage des informations
-    printf("\n--- Informations de l'animal ---\n");
-    printf("ID: %d\n", animal.id);
-    printf("Nom: %s\n", animal.nom);
-    printf("Espèce: %s\n", animal.espece);
-    printf("Année de naissance: %d\n", animal.annee_naissance);
-    printf("Poids: %.2f kg\n", animal.poids);
-    printf("Commentaire: %s\n", animal.commentaire);
+    fprintf(fichier, "ID: %d\n", nouvelAnimal.id);
+    fprintf(fichier, "Nom: %s\n", nouvelAnimal.nom);
+    fprintf(fichier, "Espèce: %s\n", nouvelAnimal.espece);
+    fprintf(fichier, "Année de naissance: %d\n", nouvelAnimal.annee_naissance);
+    fprintf(fichier, "Poids: %.2f\n", nouvelAnimal.poids);
+    fprintf(fichier, "Commentaire: %s\n\n", nouvelAnimal.commentaire);
 
-    // Sauvegarde des informations dans un fichier
-    FILE *fichier = fopen("animaux.txt", "a");  // Ouvre le fichier en mode ajout (a)
-    if (fichier == NULL) {
-        printf("Erreur d'ouverture du fichier.\n");
-        return 1;  // Quitte le programme si le fichier ne peut pas être ouvert
-    }
-    
-    int choix;
-
-    printf("quelle action souhaitez-vous effectuer? 1: rechercher 2: Ajouter 3:Adopter");
-    scanf("%d", &choix);
-    // Écriture des informations dans le fichier
-    fprintf(fichier, "ID: %d\n", animal.id);
-    fprintf(fichier, "Nom: %s\n", animal.nom);
-    fprintf(fichier, "Espèce: %s\n", animal.espece);
-    fprintf(fichier, "Année de naissance: %d\n", animal.annee_naissance);
-    fprintf(fichier, "Poids: %.2f\n", animal.poids);
-    fprintf(fichier, "Commentaire: %s\n\n", animal.commentaire);  // \n\n pour séparer les animaux
-
-    // Fermeture du fichier
     fclose(fichier);
-
-    printf("\nLes informations ont été sauvegardées dans le fichier 'animaux.txt'.\n");
-
-    return 0;
+    printf("L'animal '%s' a été ajouté au fichier.\n", nouvelAnimal.nom);
 }
-// reste à faire
 
+void rechercherAnimal() {
+    int choix2;
+    printf("Vous souhaitez rechercher en fonction de quoi ?\n");
+    printf("1: Nom\n");
+    printf("2: Âge\n");
+    printf("3: Espèce\n");
+    scanf("%d", &choix2);
+    getchar();
 
-#include <stdio.h>
+    FILE *fichier = fopen("animaux.txt", "r");
+    if (fichier == NULL) {
+        printf("Erreur d'ouverture du fichier animaux.txt\n");
+        return;
+    }
 
-// Prototypes des fonctions (on les écrira plus tard)
-void ajouterAnimal();
-void rechercherAnimal();
-void adopterAnimal();
+    char ligne[200];
+    int animal_trouve = 0;
+    int nb_trouves = 0;
+    Animal animal_courant;
 
-// Fonction pour afficher le menu dans un fichier
-void afficherMenu(FILE *fichier) {
-    fprintf(fichier, "\n--- Menu ChenYl-Tech ---\n");
-    fprintf(fichier, "1. Ajouter un animal\n");
-    fprintf(fichier, "2. Rechercher un animal\n");
-    fprintf(fichier, "3. Adopter un animal\n");
-    fprintf(fichier, "4. Quitter\n");
-    fprintf(fichier, "Votre choix : ");
+    if (choix2 == 1) { // Recherche par nom
+        char nom_recherche[30];
+        printf("Veuillez entrer le nom de l'animal que vous souhaitez rechercher:\n");
+        scanf("%s", nom_recherche);
+        getchar();
+
+        /*while (fgets(ligne, sizeof(ligne), fichier)) {
+            if (strncmp(ligne, "Nom: ", 5) == 0) {
+                ligne[strcspn(ligne, "\n")] = 0;
+                if (comparer(ligne + 5, nom_recherche) == 0) {
+                    printf("Animal trouvé : %s\n", ligne);
+                    animal_trouve = 1;*/
+         while (fgets(ligne, sizeof(ligne), fichier)) {
+        if (strncmp(ligne, "Nom: ", 5) == 0) {
+            ligne[strcspn(ligne, "\n")] = 0;
+            printf("Ligne lue du fichier (Nom): '%s'\n", ligne); // Ajout de debug
+            printf("Nom recherché: '%s'\n", nom_recherche); // Ajout de debug
+            if (comparer(ligne + 5, nom_recherche) == 0) {
+                printf("Comparaison réussie!\n"); // Ajout de debug
+                printf("Animal trouvé : %s\n", ligne);
+                animal_trouve = 1;
+                // ... le reste du code ...
+                break;
+            } else {
+                printf("Comparaison échouée.\n"); // Ajout de debug
+            }
+        }
+
+                    if (fgets(ligne, sizeof(ligne), fichier) && strncmp(ligne, "ID: ", 4) == 0) sscanf(ligne + 4, "%d", &animal_courant.id);
+                    if (fgets(ligne, sizeof(ligne), fichier) && strncmp(ligne, "Espèce: ", 8) == 0) { ligne[strcspn(ligne, "\n")] = 0; strcpy(animal_courant.espece, ligne + 8); }
+                    if (fgets(ligne, sizeof(ligne), fichier) && strncmp(ligne, "Année de naissance: ", 19) == 0) sscanf(ligne + 19, "%d", &animal_courant.annee_naissance);
+                    if (fgets(ligne, sizeof(ligne), fichier) && strncmp(ligne, "Poids: ", 7) == 0) sscanf(ligne + 7, "%f", &animal_courant.poids);
+                    if (fgets(ligne, sizeof(ligne), fichier) && strncmp(ligne, "Commentaire: ", 13) == 0) { ligne[strcspn(ligne, "\n")] = 0; strcpy(animal_courant.commentaire, ligne + 13); }
+
+                    char nom_fichier[50];
+                    sprintf(nom_fichier, "animal_%d.txt", animal_courant.id);
+                    FILE *fichier_individuel = fopen(nom_fichier, "w");
+                    if (fichier_individuel != NULL) {
+                        fprintf(fichier_individuel, "ID: %d\n", animal_courant.id);
+                        fprintf(fichier_individuel, "Nom: %s\n", animal_courant.nom);
+                        fprintf(fichier_individuel, "Espèce: %s\n", animal_courant.espece);
+                        fprintf(fichier_individuel, "Année de naissance: %d\n", animal_courant.annee_naissance);
+                        fprintf(fichier_individuel, "Poids: %.2f kg\n", animal_courant.poids);
+                        fprintf(fichier_individuel, "Commentaire: %s\n", animal_courant.commentaire);
+                        fclose(fichier_individuel);
+                        printf("Fichier individuel '%s' créé.\n", nom_fichier);
+                    } else {
+                        printf("Erreur lors de la création du fichier individuel.\n");
+                    }
+                    break;
+                }
+            }
+            while (fgets(ligne, sizeof(ligne), fichier) && strncmp(ligne, "Nom: ", 5) != 0 && !feof(fichier));
+            if (!feof(fichier)) {
+                fseek(fichier, -strlen(ligne), SEEK_CUR);
+            }
+        }
+        if (!animal_trouve) {
+            printf("Animal non trouvé.\n");
+        }
+    } else if (choix2 == 2) { // Recherche par âge
+        int age_recherche;
+        printf("Veuillez entrer l'âge de l'animal que vous souhaitez rechercher:\n");
+        scanf("%d", &age_recherche);
+        getchar();
+
+        time_t t = time(NULL);
+        struct tm tm = *localtime(&t);
+        int annee_actuelle = tm.tm_year + 1900;
+
+        rewind(fichier);
+        while (fgets(ligne, sizeof(ligne), fichier)) {
+            if (strncmp(ligne, "Année de naissance: ", 19) == 0) {
+                int annee_naissance;
+                if (sscanf(ligne + 19, "%d", &annee_naissance) == 1) {
+                    if (annee_actuelle - annee_naissance == age_recherche) {
+                        printf("Animal trouvé (Année de naissance: %d)\n", annee_naissance);
+                        animal_trouve = 1;
+                        break;
+                    }
+                }
+            }
+        }
+        if (!animal_trouve) {
+            printf("Aucun animal de cet âge n'a été trouvé.\n");
+        }
+    } else if (choix2 == 3) { // Recherche par espèce
+        char espece_recherche[30];
+        printf("Veuillez entrer l'espèce de l'animal que vous souhaitez rechercher:\n");
+        scanf("%s", espece_recherche);
+        getchar();
+
+        rewind(fichier);
+        while (fgets(ligne, sizeof(ligne), fichier)) {
+            if (strncmp(ligne, "Espèce: ", 8) == 0) {
+                ligne[strcspn(ligne, "\n")] = 0;
+                if (comparer(ligne + 8, espece_recherche) == 0) {
+                    printf("Animal trouvé : %s\n", ligne);
+                    nb_trouves++;
+                    animal_trouve = 1;
+                }
+            }
+        }
+        if (!animal_trouve) {
+            printf("Aucun animal de cette espèce n'a été trouvé.\n");
+        } else {
+            printf("\nNombre d'animaux de cette espèce trouvés : %d\n", nb_trouves);
+        }
+    } else {
+        printf("Choix invalide.\n");
+    }
+
+    fclose(fichier);
+}
+
+void adopterAnimal() {
+    char nom_adoption[30];
+    int animal_trouve = 0;
+    FILE *fichier_lecture = fopen("animaux.txt", "r");
+    FILE *fichier_temporaire = fopen("temporaire.txt", "w");
+    char ligne[200];
+
+    if (fichier_lecture == NULL || fichier_temporaire == NULL) {
+        printf("Erreur d'ouverture des fichiers.\n");
+        return;
+    }
+
+    printf("\n--- Adopter un animal ---\n");
+    printf("Entrez le nom de l'animal à adopter : ");
+    scanf("%s", nom_adoption);
+    getchar();
+
+    while (fgets(ligne, sizeof(ligne), fichier_lecture)) {
+        fputs(ligne, fichier_temporaire);
+        if (strncmp(ligne, "Nom: ", 5) == 0) {
+            ligne[strcspn(ligne, "\n")] = 0;
+            if (comparer(ligne + 5, nom_adoption) == 0) {
+                animal_trouve = 1;
+                if (fgets(ligne, sizeof(ligne), fichier_lecture) && strncmp(ligne, "ID: ", 4) == 0) fputs(ligne, fichier_temporaire);
+                if (fgets(ligne, sizeof(ligne), fichier_lecture) && strncmp(ligne, "Espèce: ", 8) == 0) fputs(ligne, fichier_temporaire);
+                if (fgets(ligne, sizeof(ligne), fichier_lecture) && strncmp(ligne, "Année de naissance: ", 19) == 0) fputs(ligne, fichier_temporaire);
+                if (fgets(ligne, sizeof(ligne), fichier_lecture) && strncmp(ligne, "Poids: ", 7) == 0) fputs(ligne, fichier_temporaire);
+                if (fgets(ligne, sizeof(ligne), fichier_lecture) && strncmp(ligne, "Commentaire: ", 13) == 0) fputs(ligne, fichier_temporaire);
+                fprintf(fichier_temporaire, "Adopté: Oui\n\n");
+                if (fgets(ligne, sizeof(ligne), fichier_lecture));
+            }
+        }
+    }
+
+    fclose(fichier_lecture);
+    fclose(fichier_temporaire);
+
+    if (animal_trouve) {
+        if (remove("animaux.txt") == 0) {
+            if (rename("temporaire.txt", "animaux.txt") != 0) {
+                printf("Erreur lors du renommage du fichier temporaire.\n");
+            } else {
+                printf("L'animal '%s' a été marqué comme adopté.\n", nom_adoption);
+            }
+        } else {
+            printf("Erreur lors de la suppression de l'ancien fichier.\n");
+        }
+    } else {
+        printf("Animal '%s' non trouvé.\n", nom_adoption);
+        remove("temporaire.txt");
+    }
 }
 
 int main() {
     int choix;
-    FILE *fichierMenu = fopen("menu.txt", "w"); // Ouvre le fichier en écriture
-
-    if (fichierMenu == NULL) {
-        printf("Erreur : Impossible de créer le fichier menu.txt\n");
-        return 1; // Indique une erreur
-    }
 
     do {
-        afficherMenu(fichierMenu); // Affiche le menu dans le fichier
-        printf("Votre choix : "); // Demande le choix à l'utilisateur (affichage console)
+        printf("\n--- Gestionnaire d'Animaux ---\n");
+        printf("1: Ajouter un animal\n");
+        printf("2: Rechercher un animal\n");
+        printf("3: Adopter un animal\n");
+        printf("4: Quitter\n");
+        printf("Choisissez une action : ");
         scanf("%d", &choix);
+        getchar();
 
         switch (choix) {
             case 1:
@@ -256,10 +297,7 @@ int main() {
             default:
                 printf("Choix invalide. Veuillez réessayer.\n");
         }
-
     } while (choix != 4);
 
-    fclose(fichierMenu); // Ferme le fichier
     return 0;
-}// chat gpt
-// CHAT GPT
+}
