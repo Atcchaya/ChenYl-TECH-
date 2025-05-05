@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 8633;LISA;CHAT;2023;34.00;Joueur
 8703;1;CHIEN;2023;34.00;excité
 8965;MILA;HAMSTER;2024;23.00;mignon
@@ -43,3 +44,5 @@ Année de naissance: 2009
 Poids: 22.00
 Commentaire: GENTIL
 
+=======
+>>>>>>> 1aa76db6baf626c2ce7e3da78a2985d7129562a9
