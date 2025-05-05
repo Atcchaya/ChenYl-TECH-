@@ -1,32 +1,23 @@
+# Définition du compilateur à utiliser
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c11
 
-# Tous les fichiers source
-SRCS = main.c \
-       animal.c \
-       ajouterAnimal.c \
-       rechercherAnimal.c \
-       adopterAnimal.c \
-       affichage.c \
-       id.c
+# Options du compilateur, ici avec les avertissements supplémentaires et le standard C99
+CFLAGS = -Wall -Wextra -std=c99
 
-# Générer les fichiers objets automatiquement
-OBJS = $(SRCS:.c=.o)
+# Liste des fichiers objets nécessaires à la compilation
+OBJ = main.o ajouterAnimal.o animal.o id.o affichage.o rechercherAnimaux.o comparer.o nettoyeur.o adopterAnimal.o dayfood.o inventaire.o utils.o
 
-# Nom de l'exécutable
-TARGET = chentyl
+# Cible principale: compilation du programme chenil
+chenil: $(OBJ)
+	# Compile le programme chenil en utilisant les fichiers objets spécifiés
+	$(CC) $(CFLAGS) -o chenil $(OBJ)
 
-# Règle par défaut
-all: $(TARGET)
+# Règle de compilation pour chaque fichier .c en .o
+%.o: %.c
+	# Compile chaque fichier source .c en un fichier objet .o
+	$(CC) $(CFLAGS) -c $<
 
-# Création de l'exécutable
-$(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $^
-
-# Nettoyer les fichiers compilés
+# Cible pour nettoyer les fichiers objets et le programme compilé
 clean:
-	rm -f $(OBJS) $(TARGET)
-
-# Nettoyer les objets uniquement
-cleanobj:
-	rm -f $(OBJS)
+	# Supprime tous les fichiers objets (.o) et l'exécutable chenil
+	rm -f *.o chenil

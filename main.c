@@ -1,145 +1,63 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <stdio.h> 
+#include "ajouterAnimal.h"  // Inclut la fonctionnalité pour ajouter un animal
+#include "affichage.h"      // Inclut la fonctionnalité pour afficher le menu et autres éléments stylisés
+#include "rechercherAnimaux.h"  // Inclut la fonctionnalité pour rechercher des animaux
+#include "nettoyeur.h"      // Inclut la fonctionnalité pour nettoyer les fichiers ou buffers
+#include "adopterAnimal.h"  // Inclut la fonctionnalité pour adopter un animal
+#include "dayfood.h"        // Inclut la fonctionnalité pour afficher la nourriture des animaux
+#include "inventaire.h"     // Inclut la fonctionnalité pour afficher l'inventaire des animaux par âge
 
-#define N 50 // Nombre maximal d'animaux dans le refuge
-#define TAILLE_MAX 100
+#define RESET   "\033[0m"     // Définit le code pour réinitialiser les couleurs de texte
+#define BLUE    "\033[38;5;32m"  // Définit la couleur bleue pour les textes
+#define GREEN   "\033[38;5;82m"  // Définit la couleur verte pour les textes
+#define YELLOW  "\033[38;5;226m" // Définit la couleur jaune pour les textes
+#define RED     "\033[38;5;160m" // Définit la couleur rouge pour les textes
+#define ORANGE  "\033[38;5;214m" // Définit la couleur orange pour les textes
 
-// Définition du type animal
-typedef struct {
-    unsigned short id;//pourquoi une déclaration pareille
-    char nom[30];
-    char espece[30];
-    int anneeNaissance;
-    float poids;
-    char commentaire[50];
-} tAnimal;
-
-// Définition de la structure contenant le tableau
-typedef struct {
-    int occup;
-    tAnimal* ptrAnimal;
-} tabAnimaux;
-
-// Fonction pour compter le nombre de lignes dans un fichier
-int compterAnimaux(const char* filename) {// pas compris
-    FILE* f = fopen(filename, "r");
-    int nb_lignes = 0;
-    char ligne[TAILLE_MAX];
-
-    if (f == NULL) {
-        printf("Fichier introuvable\n");
-        return 0;
-    }
-
-    while (fgets(ligne, TAILLE_MAX, f) != NULL) {
-        nb_lignes++;
-    }
-
-    fclose(f);
-    return nb_lignes;
+// Fonction pour afficher un message de départ stylisé
+void quitter() {
+    // Message avec bordure et emojis pour un départ élégant
+    printf("\033[38;5;45m╔════════════════════════════════════════╗\n");  // Bordure supérieure stylisée
+    printf("║    ✨ Merci d'avoir utilisé notre service ! ✨ ║\n");    // Message de remerciement
+    printf("║      🐾 À bientôt ! 👋🐾                    ║\n");          // Message d'adieu
+    printf("╚════════════════════════════════════════╝\033[0m\n");    // Bordure inférieure stylisée et réinitialisation des couleurs
 }
 
-// Fonction pour charger les données du fichier dans une structure tabAnimaux
-tabAnimaux load_file(const char* filename) {
-    FILE* f = fopen(filename, "r");
-    tabAnimaux tab;
-    tab.occup = 0;
-    tab.ptrAnimal = NULL;// pas compris
-
-    if (f == NULL) {
-        printf("Fichier %s introuvable !\n", filename);
-        return tab;
-    }
-
-    tab.occup = compterAnimaux(filename);
-    tab.ptrAnimal = (tAnimal*)malloc(tab.occup * sizeof(tAnimal));
-
-    for (int i = 0; i < tab.occup; i++) {
-        fscanf(f, "%hu %s %s %d %f %s",
-               &tab.ptrAnimal[i].id,
-               tab.ptrAnimal[i].nom,
-               tab.ptrAnimal[i].espece,
-               &tab.ptrAnimal[i].anneeNaissance,
-               &tab.ptrAnimal[i].poids,
-               tab.ptrAnimal[i].commentaire);
-    }
-
-    fclose(f);
-    return tab;
-}
-
-// Fonction d'affichage des animaux
-void afficherAnimaux(const tabAnimaux tab) {
-    printf("Nombre d'animaux : %d\n", tab.occup);
-    printf("-----------------------------\n");
-
-    for (int i = 0; i < tab.occup; i++) {
-        tAnimal a = tab.ptrAnimal[i];
-        printf("ID : %hu; ", a.id);
-        printf("Nom : %s; ", a.nom);
-        printf("Espece : %s; ", a.espece);
-        printf("Annee de naissance : %d; ", a.anneeNaissance);
-        printf("Poids : %.2f kg; ", a.poids);
-        printf("Commentaire : %s;\n", a.commentaire);
-        printf("-----------------------------\n");
-    }
-}
-
-// Fonction d'ajout d'un nouvel animal dans le fichier
-void ajouterAnimal(const char* filename) {
-    int nbAnimaux = compterAnimaux(filename);
-    if (nbAnimaux >= N) {
-        printf("Limite de 50 animaux atteinte.\n");
-        return;
-    }
-
-    tAnimal nvAnimal;
-    nvAnimal.id = nbAnimaux + 1;
-
-    printf("Nom : ");
-    scanf("%s", nvAnimal.nom);
-    printf("Espece : ");
-    scanf("%s", nvAnimal.espece);
-    printf("Annee de naissance : ");
-    scanf("%d", &nvAnimal.anneeNaissance);
-    printf("Poids : ");
-    scanf("%f", &nvAnimal.poids);
-    printf("Commentaire : ");
-    scanf("%s", nvAnimal.commentaire);
-
-    FILE* f = fopen(filename, "a");
-    if (f == NULL) {
-        printf("Fichier introuvable.\n");
-        return;
-    }
-
-    fprintf(f, "\n%hu %s %s %d %.2f %s",
-            nvAnimal.id,
-            nvAnimal.nom,
-            nvAnimal.espece,
-            nvAnimal.anneeNaissance,
-            nvAnimal.poids,
-            nvAnimal.commentaire);
-
-    fclose(f);
-}
-
-// Fonction principale
 int main() {
-    const char* nom_fichier = "file.txt";
+    // Nettoyage automatique au démarrage pour garantir que les fichiers sont à jour
+    nettoyerFichierAnimaux();
 
-    printf("Avant ajout d'un nouvel animal\n");
-    tabAnimaux refuge = load_file(nom_fichier);
-    afficherAnimaux(refuge);
-    free(refuge.ptrAnimal);
+    int choix;  // Variable pour stocker le choix de l'utilisateur
+    do {
+        afficherMenu();  // Affiche le menu complet avec les options
+        scanf("%d", &choix);  // Récupère le choix de l'utilisateur
+        while (getchar() != '\n');  // Vider le buffer pour éviter les erreurs de lecture lors de prochaines entrées
 
-    ajouterAnimal(nom_fichier);
+        switch (choix) {
+            case 1:
+                ajouterAnimal();  // Appelle la fonction pour ajouter un nouvel animal
+                break;
+            case 2:
+                rechercherAnimaux();  // Appelle la fonction pour rechercher des animaux
+                break;
+            case 3:
+                adopterAnimal();  // Appelle la fonction pour adopter un animal
+                break;
+            case 4:
+                afficherNourriture();  // Appelle la fonction pour afficher les besoins en croquettes des animaux
+                break;
+            case 5: 
+                afficherInventaireAge();  // Affiche l'inventaire des animaux par tranche d'âge
+                break;
+            case 6:
+                quitter();  // Affiche un message de départ stylisé pour quitter l'application
+                break;
+            default:
+                // Si l'utilisateur choisit une option invalide, on affiche un message d'erreur
+                printf("%s⚠️ Option invalide !%s\n", RED, RESET);
+        }
 
-    printf("Apres ajout d'un nouvel animal\n");
-    refuge = load_file(nom_fichier);
-    afficherAnimaux(refuge);
-    free(refuge.ptrAnimal);
+    } while (choix != 6);  // La boucle continue tant que l'utilisateur n'a pas choisi 6 (Quitter)
 
-    return 0;
+    return 0;  // Fin de l'application
 }
