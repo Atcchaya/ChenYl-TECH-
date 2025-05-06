@@ -1,4 +1,10 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include "affichage.h"  // Pour retourMenu()
+#include "utilitaires.h"
+
+#define MAX_ANIMAUX 50
 
 typedef struct {
     int id;
@@ -6,92 +12,118 @@ typedef struct {
     char nom[20];
     int age;
     float poids;
+    char commentaire[100];
 } Animal;
 
-// Vérifie si un ID existe déjà dans le fichier
-int idExisteDeja(int idRecherche) {
-    FILE *fichier = fopen("animaux.txt", "r");
-    if (fichier == NULL) 
-     return 0; // Le fichier n'existe pas encore
-
-    int id;
-    while (fscanf(fichier, "%d", &id) == 1) {
-        if (id == idRecherche) {
-            fclose(fichier);
-            return 1;
-        }
-        fscanf(fichier, "%*d %*s %*d %*f"); // ignorer le reste de la ligne
-    }
-
-    fclose(fichier);
-    return 0;
-}
+// (Les autres fonctions sont inchangées : obtenirDernierID, compterAnimaux, estEntier, estNomValide, calculerLongueur...)
 
 void ajouterAnimal() {
-    Animal nouvelAnimal;
-
-    // Saisie et vérification de l'ID
-    do {
-        printf("Entrez l'ID de l'animal (entre 1 et 9999) : ");
-        scanf("%d", &nouvelAnimal.id);
-
-        if (nouvelAnimal.id < 1 || nouvelAnimal.id > 9999) {
-            printf("❌ ID invalide. Veuillez entrer une valeur entre 1 et 9999.\n");
-        } else if (idExisteDeja(nouvelAnimal.id)) {
-            printf("❌ Cet ID existe déjà. Veuillez en choisir un autre.\n");
-            nouvelAnimal.id = -1; // forcer à recommencer
-        }
-    } while (nouvelAnimal.id < 1 || nouvelAnimal.id > 9999);
-
-    // Saisie et vérification de l'espèce
-    do {
-        printf("Entrez l'espèce :\n");
-        printf(" 1 = Chien\n 2 = Chat\n 3 = Lapin\n 4 = Hamster\nVotre choix : ");
-        scanf("%d", &nouvelAnimal.espece);
-
-        if (nouvelAnimal.espece < 1 || nouvelAnimal.espece > 4) {
-            printf("❌ Espèce invalide. Veuillez choisir un nombre entre 1 et 4.\n");
-        }
-    } while (nouvelAnimal.espece < 1 || nouvelAnimal.espece > 4);
-
-    // Saisie du nom
-    printf("Entrez le nom de l'animal (max 19 caractères, sans espaces) : ");
-    scanf("%19s", nouvelAnimal.nom); // pas besoin de string.h
-
-    // Saisie et vérification de l'âge
-    do {
-        printf("Entrez l'âge (en années, entre 0 et 50) : ");
-        scanf("%d", &nouvelAnimal.age);
-
-        if (nouvelAnimal.age < 0 || nouvelAnimal.age > 50) {
-            printf("❌ Âge invalide. Veuillez entrer une valeur entre 0 et 50.\n");
-        }
-    } while (nouvelAnimal.age < 0 || nouvelAnimal.age > 50);
-
-    // Saisie et vérification du poids
-    do {
-        printf("Entrez le poids (en kg, entre 0.1 et 100.0) : ");
-        scanf("%f", &nouvelAnimal.poids);
-
-        if (nouvelAnimal.poids < 0.1f || nouvelAnimal.poids > 100.0f) {
-            printf("❌ Poids invalide. Veuillez entrer une valeur entre 0.1 et 100.0 kg.\n");
-        }
-    } while (nouvelAnimal.poids < 0.1f || nouvelAnimal.poids > 100.0f);
-
-    // Ajout dans le fichier
-    FILE *fichier = fopen("animaux.txt", "a");
-    if (fichier == NULL) {
-        printf("❌ Erreur : impossible d'ouvrir le fichier.\n");
+    if (compterAnimaux() >= MAX_ANIMAUX) {
+        printf("❌ Le refuge est plein, impossible d'ajouter un nouvel animal. (Max %d animaux)\n", MAX_ANIMAUX);
+        retourMenu();  // 🔁 Retour
         return;
     }
 
-    fprintf(fichier, "%d %d %s %d %.2f\n",
-            nouvelAnimal.id,
-            nouvelAnimal.espece,
-            nouvelAnimal.nom,
-            nouvelAnimal.age,
-            nouvelAnimal.poids);
+    Animal animal;
+    char input[100];
 
+    // Nom
+    do {
+        printf("Nom de l'animal (max 19 caractères alphanumériques) : ");
+        scanf("%s", input);
+        if (!estNomValide(input)) {
+            printf("⚠️ Nom invalide. Max 19 caractères et alphanumériques seulement.\n");
+        } else {
+            int i = 0;
+            while (input[i] != '\0' && i < 19) {
+                animal.nom[i] = input[i];
+                i++;
+            }
+            animal.nom[i] = '\0';
+            break;
+        }
+    } while (1);
+
+    // Espèce
+    do {
+        printf("Espèce de l'animal :\n");
+        printf("1 = Chien\n2 = Chat\n3 = Lapin\n4 = Hamster\n");
+        printf("Entrez le numéro correspondant (1 à 4) : ");
+        scanf("%s", input);
+
+        if (!estEntier(input)) {
+            printf("⚠️ Veuillez entrer un numéro entier valide pour l'espèce.\n");
+        } else {
+            animal.espece = atoi(input);
+            if (animal.espece < 1 || animal.espece > 4) {
+                printf("⚠️ L'espèce doit être entre 1 et 4.\n");
+            } else {
+                break;
+            }
+        }
+    } while (1);
+
+    // Âge
+    do {
+        printf("Âge de l'animal (entier positif) : ");
+        scanf("%s", input);
+        int age = atoi(input);
+        if (!estEntier(input) || age < 0 || age > 100) {
+            printf("⚠️ L'âge doit être un entier positif et raisonnable (maximum 100 ans).\n");
+        } else {
+            animal.age = age;
+            break;
+        }
+    } while (1);
+
+    // Poids
+    do {
+        printf("Poids de l'animal (en kg) : ");
+        if (scanf("%f", &animal.poids) != 1 || animal.poids <= 0) {
+            printf("⚠️ Le poids doit être un nombre strictement positif.\n");
+            while (getchar() != '\n');  // Nettoyer le buffer
+        } else {
+            break;
+        }
+    } while (1);
+
+    while (getchar() != '\n'); // Nettoyer le buffer de toute entrée précédente
+
+    // Commentaire
+    printf("Commentaire sur l'animal (max 99 caractères) : ");
+    fgets(animal.commentaire, sizeof(animal.commentaire), stdin);
+    size_t len = calculerLongueur(animal.commentaire);
+    if (len > 0 && animal.commentaire[len - 1] == '\n') {
+        animal.commentaire[len - 1] = '\0'; // Supprimer le '\n' ajouté par fgets
+    }
+
+    // ID automatique
+    animal.id = obtenirDernierID() + 1;
+    printf("ID généré : %d\n", animal.id);
+
+    // Affichage résumé
+    printf("\n✅ Animal ajouté :\n");
+    printf("Nom : %s\nEspèce : %d\nÂge : %d\nPoids : %.2f kg\nCommentaire : %s\n",
+           animal.nom, animal.espece, animal.age, animal.poids, animal.commentaire);
+
+    // Enregistrement dans le fichier
+    FILE *fichier = fopen("animaux.txt", "a");
+    if (!fichier) {
+        printf("❌ Erreur lors de l'ouverture du fichier.\n");
+        retourMenu();  // 🔁 Retour
+        return;
+    }
+
+    // Vérifier que l'enregistrement dans le fichier est effectué correctement
+    if (fprintf(fichier, "%d %d %s %d %.2f %s\n",
+                animal.id, animal.espece, animal.nom, animal.age, animal.poids, animal.commentaire) < 0) {
+        printf("❌ Erreur lors de l'écriture dans le fichier.\n");
+    } else {
+        printf("📁 Données enregistrées dans animaux.txt\n");
+    }
+
+    // Fermeture du fichier
     fclose(fichier);
-    printf("✅ Animal ajouté avec succès !\n");
+
+    retourMenu();  // 🔁 Retour au menu principal
 }

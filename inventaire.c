@@ -1,65 +1,88 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
-#include "animal.h"
-#include "utils.h"
+#include "affichage.h"
 
-// Fonction pour afficher l'inventaire des animaux par tranche d'âge
-void afficherInventaireAge() {
-    // Ouvre le fichier contenant les animaux
-    FILE *f = fopen("animaux/animaux.txt", "r");
-    if (!f) {
-        // Si le fichier n'existe pas, afficher une erreur et quitter la fonction
-        printf("\033[38;5;196m❌ Impossible d'ouvrir le fichier.\033[0m 🚫\n");
+
+
+#define MAX_ANIMAUX 100
+
+typedef struct {
+    int id;
+    int espece;
+    char nom[20];
+    int age;
+    float poids;
+} Animal;
+
+void afficherQuartilesAge() {
+    Animal animaux[MAX_ANIMAUX];
+    int total = 0;
+
+    FILE *fichier = fopen("animaux.txt", "r");
+    if (fichier == NULL) {
+        printf("❌ Erreur : impossible d'ouvrir le fichier des animaux.\n");
         return;
     }
 
-    // Obtient l'année actuelle pour le calcul de l'âge des animaux
-    time_t t = time(NULL);  // Récupère l'heure actuelle
-    struct tm tm = *localtime(&t);  // Convertit le temps en une structure locale
-    int annee_actuelle = tm.tm_year + 1900;  // Récupère l'année en cours
+    // Lecture ligne par ligne et extraction des informations
+    char ligne[256];
+    while (fgets(ligne, sizeof(ligne), fichier)) {
+        if (sscanf(ligne, "%d %d %s %d %f",
+                   &animaux[total].id,
+                   &animaux[total].espece,
+                   animaux[total].nom,
+                   &animaux[total].age,
+                   &animaux[total].poids) == 5) {
+            total++;
+            if (total >= MAX_ANIMAUX) break;
+        }
+    }
+    fclose(fichier);
 
-    // Variables pour compter les animaux dans chaque tranche d'âge
-    int total_animaux = 0;  // Nombre total d'animaux
-    int jeunes = 0;         // Nombre d'animaux de moins de 2 ans
-    int adultes = 0;        // Nombre d'animaux entre 2 et 5 ans
-    int seniors = 0;        // Nombre d'animaux entre 6 et 10 ans
-    int tres_seniors = 0;   // Nombre d'animaux de plus de 10 ans
+    if (total == 0) {
+        printf("Aucun animal dans le refuge.\n");
+        return;
+    }
 
-    Animal a;  // Déclare une variable de type Animal pour lire chaque ligne du fichier
-    char especeLue[50];  // Tableau pour stocker l'espèce lue du fichier
-
-    // Parcours chaque animal dans le fichier
-    while (fscanf(f, "%d;%49[^;];%49[^;];%d;%f;%255[^\n]\n", 
-                  &a.id, a.nom, especeLue, &a.annee_naissance, 
-                  &a.poids, a.commentaire) == 6) {  // Lit chaque ligne du fichier
-
-        // Calcule l'âge de l'animal
-        int age = annee_actuelle - a.annee_naissance;  
-        total_animaux++;  // Incrémente le nombre total d'animaux
-
-        // Classe l'animal selon son âge
-        if (age < 2) {
-            jeunes++;  // Si l'animal a moins de 2 ans, l'incrémenter dans la catégorie jeunes
-        } else if (age >= 2 && age <= 5) {
-            adultes++;  // Si l'animal a entre 2 et 5 ans, l'incrémenter dans la catégorie adultes
-        } else if (age >= 6 && age <= 10) {
-            seniors++;  // Si l'animal a entre 6 et 10 ans, l'incrémenter dans la catégorie seniors
-        } else if (age > 10) {
-            tres_seniors++;  // Si l'animal a plus de 10 ans, l'incrémenter dans la catégorie très seniors
+    // Trie les animaux par âge (tri à bulles)
+    for (int i = 0; i < total - 1; i++) {
+        for (int j = 0; j < total - i - 1; j++) {
+            if (animaux[j].age > animaux[j + 1].age) {
+                Animal temp = animaux[j];
+                animaux[j] = animaux[j + 1];
+                animaux[j + 1] = temp;
+            }
         }
     }
 
-    fclose(f);  // Ferme le fichier une fois que la lecture est terminée
+    // Calcul des quartiles
+    int quart = total / 4;
+    int reste = total % 4;
+    int index = 0;
 
-    // Affichage des résultats avec une présentation esthétique (formaté)
-    printf("\n\033[38;5;82m╔══════════════════════════════════════════════════════╗\n");
-    printf("\033[38;5;82m║               📊 Inventaire par Âge des Animaux        ║\n");
-    printf("\033[38;5;82m╠══════════════════════════════════════════════════════╣\n");
-    printf("\033[38;5;33m║ Total des animaux    : \033[38;5;45m%d\033[0m               ║\n", total_animaux);
-    printf("\033[38;5;61m║ Jeunes (< 2 ans)     : \033[38;5;45m%d\033[0m               ║\n", jeunes);
-    printf("\033[38;5;208m║ Adultes (2-5 ans)    : \033[38;5;45m%d\033[0m               ║\n", adultes);
-    printf("\033[38;5;214m║ Seniors (6-10 ans)   : \033[38;5;45m%d\033[0m               ║\n", seniors);
-    printf("\033[38;5;40m║ Très seniors (> 10 ans) : \033[38;5;45m%d\033[0m           ║\n", tres_seniors);
-    printf("\033[38;5;82m╚══════════════════════════════════════════════════════╝\n");
+    printf("==================================\n");
+    printf("     Inventaire par âge (croissant)\n");
+    printf("==================================\n\n");
+
+    printf("Nombre total d’animaux : %d\n\n", total);
+
+    // Affichage des quartiles
+    for (int q = 0; q < 4; q++) {
+        // Calcul de la taille de chaque tranche
+        int taille = quart + (q < reste ? 1 : 0);
+        int minAge = animaux[index].age;
+        int maxAge = animaux[index + taille - 1].age;
+
+        // Affichage des résultats
+        if (q == 0) {
+            printf("Tranche 1 (âges les plus jeunes) : %d animaux (de %d à %d ans)\n", taille, minAge, maxAge);
+        } else if (q == 3) {
+            printf("Tranche 4 (âges les plus âgés) : %d animaux (de %d à %d ans)\n", taille, minAge, maxAge);
+        } else {
+            printf("Tranche %d : %d animaux (de %d à %d ans)\n", q + 1, taille, minAge, maxAge);
+        }
+
+        // Mise à jour de l'indice
+        index += taille;
+    }
 }
