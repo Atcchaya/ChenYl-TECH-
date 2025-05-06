@@ -7,4 +7,7 @@ int compareStr(const char* a, const char* b);
 // Déclare la fonction afficherNourriture qui gère l'affichage des informations sur les croquettes des animaux
 void afficherNourriture();
 
+// Déclare la fonction nourrirAnimal qui gère la logique de nourrissage des animaux
+void nourrirAnimal();
+
 #endif  // Fin de la condition de préprocesseur pour le fichier d'en-tête

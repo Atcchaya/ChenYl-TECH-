@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include "ajouterAnimal.h"
 #include "affichage.h"
+#include "ajouterAnimal.h"
 #include "rechercherAnimaux.h"
 #include "adopterAnimal.h"
 #include "dayfood.h"
@@ -14,36 +14,48 @@ void quitter() {
     printf("╚════════════════════════════════════════╝\n");
 }
 
+// Fonction pour afficher le menu et obtenir un choix valide
+int afficherMenuEtObtenirChoix() {
+    int choix;
+    while (1) {
+        afficherMenu();  // Affiche le menu
+        if (scanf("%d", &choix) == 1 && choix >= 1 && choix <= 6) {
+            return choix;
+        } else {
+            printf("⚠️ Option invalide ! Veuillez entrer un nombre entre 1 et 6.\n");
+            while (getchar() != '\n');  // Vider le tampon d'entrée
+        }
+    }
+}
+
 int main() {
     int choix;
     do {
-        afficherMenu();  // Affiche le menu
-        scanf("%d", &choix);  // Demande le choix de l'utilisateur
+        choix = afficherMenuEtObtenirChoix();
 
         switch (choix) {
             case 1:
-                ajouterAnimal();  // Fonction pour ajouter un animal
+                ajouterAnimal();
                 break;
             case 2:
-                rechercherAnimaux();  // Fonction pour rechercher un animal
+                rechercherAnimaux();
                 break;
             case 3:
-                adopterAnimal();  // Fonction pour adopter un animal
+                adopterAnimal();
                 break;
             case 4:
-                afficherNourriture();  // Fonction pour gérer la nourriture
+                afficherNourriture();  
                 break;
             case 5:
-                afficherQuartilesAge();  // Fonction pour afficher les tranches d'âge
+                afficherQuartilesAge();
                 break;
             case 6:
-                quitter();  // Affiche un message de départ et quitte
+                quitter();
                 break;
             default:
-                printf("⚠️ Option invalide !\n");  // Si l'option n'est pas valide
+                printf("⚠️ Option inconnue.\n");
         }
 
-    } while (choix != 6);  // Tant que l'utilisateur ne choisit pas "Quitter"
-
-    return 0;  // Quitte le programme
+    } while (choix != 6);
+    return 0;
 }
