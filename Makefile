@@ -5,6 +5,7 @@ OBJ = main.o adopterAnimal.o affichage.o ajouterAnimal.o dayfood.o inventaire.o 
 # Cible principale pour créer l'exécutable chenil
 chenil: $(OBJ)
 	$(CC) $(OBJ) -o chenil || { echo 'Erreur de compilation'; exit 1; }
+	./chenil
 
 # Compilation des fichiers .o
 main.o: main.c
