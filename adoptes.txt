@@ -1,0 +1,6 @@
+7 1 Bella 13 20.5 Très amicale et joueuse
+25 2 Stitch 5 10.1 Très affectueux et joueur
+1 1 Rex 1 10.0 Très courageux et fidèle
+51 1 Rex 5 3.5 Un chien adorable
+2 2 Milou 3 8.0 Petit chien énergique
+8 3 Simba 5 27.8 Lionceau en pleine forme

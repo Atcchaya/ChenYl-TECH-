@@ -1,86 +1,69 @@
-#include <stdio.h>      // Pour les fonctions d'entrée/sortie : printf, scanf, fopen, etc.
-#include <stdlib.h>     // Pour les fonctions utilitaires : remove, rename, etc.
-#include "animal.h"     // Inclut la structure Animal et ses définitions
+#include <stdio.h>
+#include "affichage.h" // pour retourMenu()
 
-// Fonction pour adopter un animal en le retirant du fichier
+typedef struct {
+    int id;
+    int espece;
+    char nom[20];
+    int age;
+    float poids;
+    char commentaire[100];
+} Animal;
+
 void adopterAnimal() {
-    // Ouverture du fichier contenant les animaux en lecture seule
-    FILE *f = fopen("animaux/animaux.txt", "r");
-    if (!f) {
-        // Message d'erreur stylisé si le fichier n'est pas accessible
-        printf("\033[38;5;88m╔════════════════════════════════════╗\n");
-        printf("║ [❗] Impossible d'accéder aux données des animaux. ║\n");
-        printf("║ Veuillez vérifier le fichier.       ║\n");
-        printf("╚════════════════════════════════════╝\033[0m\n");  
-        return; // Quitte la fonction en cas d'erreur
-    }
+    int idRecherche;
+    printf("Entrez l'ID de l'animal à adopter : ");
+    scanf("%d", &idRecherche);
 
-    int idRecherche; // Variable pour stocker l'ID entré par l'utilisateur
-
-    // Demande à l'utilisateur quel animal il veut adopter (via son ID)
-    printf("\033[38;5;45m╔════════════════════════════════════╗\n");
-    printf("║ [🔍] Entrez l'ID de l'animal que vous souhaitez adopter : ║\n");
-    printf("╚════════════════════════════════════╝\033[0m");  
-    scanf("%d", &idRecherche); // Lecture de l'entrée utilisateur
-
-    // Création d'un fichier temporaire pour y recopier les animaux restants
-    FILE *temp = fopen("animaux/animaux_temp.txt", "w");
-    if (!temp) {
-        // Message d'erreur stylisé si le fichier temporaire échoue
-        printf("\033[38;5;88m╔════════════════════════════════════╗\n");
-        printf("║ [❗] Échec de création du fichier temporaire. ║\n");
-        printf("╚════════════════════════════════════╝\033[0m\n");  
-        fclose(f); // On ferme le fichier original
+    FILE *fichier = fopen("animaux.txt", "r");
+    if (fichier == NULL) {
+        printf("❌ Erreur : impossible d'ouvrir le fichier des animaux.\n");
+        retourMenu();  // 🔁 retour
         return;
     }
 
-    int trouve = 0; // Booléen : 1 si l'animal a été trouvé, sinon 0
-    Animal a; // Structure pour stocker les données d'un animal
-    char especeStr[20]; // Variable temporaire pour stocker l'espèce en texte
+    FILE *temp = fopen("animaux_temp.txt", "w");
+    FILE *adoptes = fopen("adoptes.txt", "a");
+    if (temp == NULL || adoptes == NULL) {
+        printf("❌ Erreur : impossible de créer les fichiers temporaires.\n");
+        fclose(fichier);
+        if (temp) fclose(temp);
+        if (adoptes) fclose(adoptes);
+        retourMenu();  // 🔁 retour
+        return;
+    }
 
-    // Lecture de chaque ligne du fichier original
-    while (fscanf(f, "%d;%49[^;];%14[^;];%d;%f;%255[^\n]",
-                  &a.id, a.nom, especeStr, &a.annee_naissance, &a.poids, a.commentaire) == 6) {
+    Animal a;
+    char description[100];
+    int trouve = 0;
+
+    while (fscanf(fichier, "%d %d %s %d %f", &a.id, &a.espece, a.nom, &a.age, &a.poids) == 5) {
+        int c, i = 0;
+        while ((c = fgetc(fichier)) != '\n' && c != EOF && i < 99) {
+            description[i++] = (char)c;
+        }
+        description[i] = '\0';
+
         if (a.id == idRecherche) {
-            trouve = 1; // L'animal à adopter est trouvé, on ne l'écrit pas
+            trouve = 1;
+            fprintf(adoptes, "%d %d %s %d %.1f%s\n", a.id, a.espece, a.nom, a.age, a.poids, description);
         } else {
-            // Réécriture des autres animaux dans le fichier temporaire
-            fprintf(temp, "%d;%s;%s;%d;%.2f;%s\n", a.id, a.nom, especeStr,
-                    a.annee_naissance, a.poids, a.commentaire);
+            fprintf(temp, "%d %d %s %d %.1f%s\n", a.id, a.espece, a.nom, a.age, a.poids, description);
         }
     }
 
-    // Fermeture des fichiers après lecture et écriture
-    fclose(f);
+    fclose(fichier);
     fclose(temp);
+    fclose(adoptes);
 
     if (trouve) {
-        // Si l'animal a été trouvé et supprimé du fichier :
-        
-        if (remove("animaux/animaux.txt") == 0) { // On supprime l'ancien fichier
-            if (rename("animaux/animaux_temp.txt", "animaux/animaux.txt") == 0) {
-                // On renomme le temporaire -> devient le nouveau fichier officiel
-                printf("\033[38;5;82m╔════════════════════════════════════╗\n");
-                printf("║ [🎉] Félicitations ! Vous avez adopté l'animal avec l'ID %d. ║\n", idRecherche);
-                printf("║ Merci pour votre geste.             ║\n");
-                printf("╚════════════════════════════════════╝\033[0m\n");
-            } else {
-                // Échec lors du renommage du fichier temporaire
-                printf("\033[38;5;88m╔════════════════════════════════════╗\n");
-                printf("║ [❗] Une erreur s'est produite lors du renommage du fichier. ║\n");
-                printf("╚════════════════════════════════════╝\033[0m\n");
-            }
-        } else {
-            // Échec de suppression de l'ancien fichier
-            printf("\033[38;5;88m╔════════════════════════════════════╗\n");
-            printf("║ [❗] Erreur lors de la suppression de l'ancien fichier. ║\n");
-            printf("╚════════════════════════════════════╝\033[0m\n");
-        }
+        remove("animaux.txt");
+        rename("animaux_temp.txt", "animaux.txt");
+        printf("✅ L'animal avec l'ID %d a été adopté et ajouté à adoptes.txt.\n", idRecherche);
     } else {
-        // Si aucun animal avec l’ID donné n’a été trouvé
-        remove("animaux/animaux_temp.txt"); // On supprime le fichier temporaire inutile
-        printf("\033[38;5;226m╔════════════════════════════════════╗\n");
-        printf("║ [⚠️] Aucun animal trouvé avec l'ID %d. ║\n", idRecherche);
-        printf("╚════════════════════════════════════╝\033[0m\n");
+        remove("animaux_temp.txt");
+        printf("⚠️ Aucun animal trouvé avec l'ID %d.\n", idRecherche);
     }
+
+    retourMenu();  // 🔁 retour au menu
 }
