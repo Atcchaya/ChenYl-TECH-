@@ -67,3 +67,4 @@ void adopterAnimal() {
 
     retourMenu();  // 🔁 retour au menu
 }
+
