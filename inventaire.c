@@ -86,3 +86,4 @@ void afficherQuartilesAge() {
         index += taille;
     }
 }
+
