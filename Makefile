@@ -35,3 +35,7 @@ utilitaires.o: utilitaires.c
 # Commande pour nettoyer les fichiers .o et l'exécutable
 clean:
 	rm -f *.o chenil || { echo 'Erreur lors du nettoyage des fichiers'; exit 1; }
+
+cleanfile:
+	rm animaux.txt
+	touch animaux.txt
