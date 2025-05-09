@@ -90,3 +90,4 @@ int estNomValide(const char *nom) {
 
     return 1;  // Nom valide
 }
+
