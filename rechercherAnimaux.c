@@ -120,3 +120,4 @@ void rechercherAnimaux() {
 
     fclose(fichier);
 }
+
