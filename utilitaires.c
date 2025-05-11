@@ -7,48 +7,46 @@
 int estEntier(char *str) {
     int i = 0;
     
-    if (str[i] == '\0') return 0; // Si la chaîne est vide, ce n'est pas un entier
+    if (str[i] == '\0') return 0; // Chaîne vide => pas un entier
 
-    // Si le premier caractère est un signe '-' (négatif), on l'ignore
-    if (str[i] == '-') {
+    // Gérer les signes + ou -
+    if (str[i] == '-' || str[i] == '+') {
         i++;
     }
-    
-    if (str[i] == '\0') return 0; // Si le signe est suivi directement d'un '\0', ce n'est pas un entier
-    
+
+    if (str[i] == '\0') return 0; // Le signe seul ne suffit pas
+
     while (str[i] != '\0') {
         if (!isdigit(str[i])) {
-            return 0; // Si un caractère n'est pas un chiffre, ce n'est pas un entier
+            return 0; // Caractère non numérique
         }
         i++;
     }
-    return 1; // La chaîne représente un entier valide
+    return 1; // Entier valide
 }
 
 // Fonction pour compter le nombre d'animaux dans le fichier
 int compterAnimaux() {
     FILE *fichier = fopen("animaux.txt", "r");
     if (!fichier) {
-        return 0;  // Retourne 0 en cas d'erreur d'ouverture
+        return 0;  // Erreur d'ouverture
     }
 
     int count = 0;
-    while (!feof(fichier)) {
-        char buffer[100];  // Buffer pour lire une ligne
-        if (fgets(buffer, sizeof(buffer), fichier)) {
-            count++;
-        }
+    char buffer[100];
+    while (fgets(buffer, sizeof(buffer), fichier)) {
+        count++;
     }
 
     fclose(fichier);
     return count;
 }
 
-// Fonction pour calculer la longueur d'un commentaire (en ignorant le '\n' final)
+// Fonction pour calculer la longueur d'un commentaire (sans '\n' final)
 size_t calculerLongueur(const char *commentaire) {
     size_t len = strlen(commentaire);
     if (len > 0 && commentaire[len - 1] == '\n') {
-        len--;  // Ignore le '\n' final
+        len--;  // Ignore le retour à la ligne final
     }
     return len;
 }
@@ -57,18 +55,15 @@ size_t calculerLongueur(const char *commentaire) {
 int obtenirDernierID() {
     FILE *fichier = fopen("animaux.txt", "r");
     if (!fichier) {
-        return 0;  // Retourne 0 si le fichier est vide ou en cas d'erreur
+        return 0;  // Fichier vide ou erreur
     }
 
     int dernierID = 0;
-    while (!feof(fichier)) {
+    char buffer[100];
+    while (fgets(buffer, sizeof(buffer), fichier)) {
         int id;
-        char buffer[100];  // Buffer pour lire une ligne
-        if (fgets(buffer, sizeof(buffer), fichier)) {
-            sscanf(buffer, "%d", &id);  // Lit l'ID à partir de la ligne
-            if (id > dernierID) {
-                dernierID = id;
-            }
+        if (sscanf(buffer, "%d", &id) == 1 && id > dernierID) {
+            dernierID = id;
         }
     }
 
@@ -76,10 +71,11 @@ int obtenirDernierID() {
     return dernierID;
 }
 
-// Fonction pour vérifier la validité du nom (alphanumérique, max 19 caractères)
+// Fonction pour vérifier la validité d'un nom (alphanumérique, max 19 caractères)
 int estNomValide(const char *nom) {
-    if (strlen(nom) > 19) {
-        return 0;  // Nom trop long
+    size_t len = strlen(nom);
+    if (len == 0 || len > 19) {
+        return 0;  // Nom vide ou trop long
     }
     
     for (int i = 0; nom[i] != '\0'; i++) {
@@ -90,4 +86,3 @@ int estNomValide(const char *nom) {
 
     return 1;  // Nom valide
 }
-
