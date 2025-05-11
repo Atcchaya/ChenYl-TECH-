@@ -1,5 +1,3 @@
-3 3 Val 1 43.0 Très gentil et affectueux
-4 1 Max 12 30.0 Très protecteur et intelligent
 5 4 Leo 0 6.5 Très curieux et aventureux
 6 2 Mia 2 4.2 Chienne calme et douce
 7 3 Nala 5 7.0 Très agité
@@ -47,3 +45,7 @@
 50 2 Flash 12 5.5 Très rapide et dynamique
 51 3 Sophie 34 45.0 beau
 52 3 Mony 3 12.0 Trés chou
+53 2 HGJHJHJ 12 267.0 BON
+54 3 TOM 4 12.0 Trés malin 
+55 2 sina 21 12.00 Rapide
+

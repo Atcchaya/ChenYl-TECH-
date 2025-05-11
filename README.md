@@ -1,6 +1,6 @@
 # 🐾 ChenYl-TECH
 
-## 📌 Description
+## 📌 Présentation:
 
 ChenYl-TECH est un programme en langage C destiné à aider les organisateurs d’un refuge pour animaux à gérer les pensionnaires du chenil **ChenYl-TECH**. Il permet notamment :
 
@@ -16,21 +16,14 @@ Le programme prend en charge les **espèces suivantes** : **chien**, **chat**, *
 
 ## ⚙️ Compilation et exécution
 
-### 🔧 Compilation
+### 🔧 Compilation/ ▶️ Exécution
 
-Pour compiler le programme et nettoyer les anciens fichiers objets et exécutables, utilisez :
+
+Pour compiler le programme et nettoyer les anciens fichiers objets et exécutables, utilisez et Pour exécuter le programme :
 
 ```bash
 make clean
 make
-```
-
-### ▶️ Exécution
-
-Pour exécuter le programme :
-
-```bash
-./chenil
 ```
 
 ---

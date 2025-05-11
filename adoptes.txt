@@ -4,3 +4,5 @@
 51 1 Rex 5 3.5 Un chien adorable
 2 2 Milou 3 8.0 Petit chien énergique
 8 3 Simba 5 27.8 Lionceau en pleine forme
+3 3 Val 1 43.0 Très gentil et affectueux
+4 1 Max 12 30.0 Très protecteur et intelligent
