@@ -1,6 +1,5 @@
 #include <stdio.h>
-#include "dayfood.h"  // Correctement inclu le fichier d'en-tête pour dayfood
-
+#include "dayfood.h"  // Fichier d'en-tête associé
 
 typedef struct {
     int id;
@@ -20,12 +19,9 @@ void afficherNourriture() {
 
     Animal a;
     float total = 0;
-    float croquettes_chien = 0;
-    float croquettes_chat = 0;
-    float croquettes_hamster = 0;
-    float croquettes_lapin = 0;  // Remplacer "autruche" par "lapin"
+    float croquettes[5] = {0};  // Index : 1=chien, 2=chat, 3=hamster, 4=lapin
 
-    const char *especes[] = {"", "chien", "chat", "hamster", "lapin"};  // Remplacer "autruche" par "lapin"
+    const char *especes[] = {"", "chien", "chat", "hamster", "lapin"};
 
     printf("\nDétail des croquettes par animal :\n");
     printf("-----------------------------------\n");
@@ -34,20 +30,25 @@ void afficherNourriture() {
         float qte = 0;
         const char *esp = (a.espece >= 1 && a.espece <= 4) ? especes[a.espece] : "inconnue";
 
-        if (a.espece == 1 || a.espece == 2) { // chien ou chat
-            qte = (a.age < 2) ? 0.5f : a.poids * 0.1f;
-            if (a.espece == 1) croquettes_chien += qte;
-            else croquettes_chat += qte;
-        } else if (a.espece == 3) {
-            qte = 0.02f;
-            croquettes_hamster += qte;
-        } else if (a.espece == 4) {  // Remplacer "autruche" par "lapin"
-            qte = 0.1f;  // Exemple de quantité pour un lapin
-            croquettes_lapin += qte;
+        switch (a.espece) {
+            case 1:  // Chien
+            case 2:  // Chat
+                qte = (a.age < 2) ? 0.5f : a.poids * 0.1f;
+                break;
+            case 3:  // Hamster
+                qte = 0.02f;
+                break;
+            case 4:  // Lapin
+                qte = 0.1f;
+                break;
+            default:
+                qte = 0.0f;
         }
 
-        total += qte;
+        if (a.espece >= 1 && a.espece <= 4)
+            croquettes[a.espece] += qte;
 
+        total += qte;
         printf("%s (%s) ➜ %.2f kg\n", a.nom, esp, qte);
     }
 
@@ -57,14 +58,10 @@ void afficherNourriture() {
     printf("   Croquettes quotidiennes à prévoir  \n");
     printf("======================================\n");
 
-    if (croquettes_chien > 0)
-        printf("Chien     : %.2f kg\n", croquettes_chien);
-    if (croquettes_chat > 0)
-        printf("Chat      : %.2f kg\n", croquettes_chat);
-    if (croquettes_hamster > 0)
-        printf("Hamster   : %.2f kg\n", croquettes_hamster);
-    if (croquettes_lapin > 0)  // Remplacer "autruche" par "lapin"
-        printf("Lapin     : %.2f kg\n", croquettes_lapin);
+    for (int i = 1; i <= 4; i++) {
+        if (croquettes[i] > 0)
+            printf("%-10s : %.2f kg\n", especes[i], croquettes[i]);
+    }
 
     printf("\nTotal nécessaire : %.2f kg\n", total);
 }
